@@ -12,23 +12,6 @@ MySimulation::MySimulation()
     memset(cycle, 0, sizeof(cycle));
     memset(color, 0,sizeof(color));
     memset(adjacentMatrix, 0, sizeof(adjacentMatrix));
-
-    for (auto it : gainModule) {
-        it.second.preValue = 0.0;
-    }
-
-    for (auto it : sumModule) {
-        it.second.preValue = 0.0;
-    }
-
-    for (auto it : multModule) {
-        it.second.preValue = 0;
-        it.second.outputValue = 0;
-    }
-
-    for (auto it : sineModule) {
-        it.second.preValue = 0.0;
-    }
     outFile.open("data.csv");
 }
 

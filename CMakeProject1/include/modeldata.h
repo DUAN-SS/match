@@ -1,4 +1,13 @@
-﻿#ifndef _MODEL_DATA_H_
+﻿/**@file  : modeldata.h
+ *@brief  : descripe the module infomation
+ *@author :
+ *@date   : 2023.12.04
+ *@version: V0.1
+ *@note   : note
+ *@detailed description:
+ */
+
+#ifndef _MODEL_DATA_H_
 #define _MODEL_DATA_H_
 #include <iostream>
 #include <map>
@@ -10,14 +19,12 @@ typedef struct ModuleInfo {
     std::string input[2];
     std::map<std::string, double> output;
     double outputValue = 0.0;
-    double preValue = 0.0;
 }ModuleInfo;
 
 typedef struct Gain {
     ModuleInfo info;
     double outputValue;
     double gainValue;
-    double preValue;
 }Gain;
 
 typedef struct Sine
@@ -25,7 +32,6 @@ typedef struct Sine
     std::map<std::string, double> output;
     double sineValue;
     double outputValue;
-    double preValue;
 }Sine;
 
 typedef struct Cons
@@ -33,21 +39,18 @@ typedef struct Cons
     std::map<std::string, double> output;
     double consValue;
     double outputValue;
-    double preValue;
 }Cons;
 
 typedef struct Disp
 {
-    std::map<std::string, double> input;   // disp 模块输入
-    double preValue;                       // disp模块的上一步的值
+    std::map<std::string, double> input;   // the input of disp module
 }Disp;
-
 
 typedef struct Timing 
 {
-    int finalTime;   // 仿真时长
-    double stepSize; // 仿真步长
-    int stepCout;    // 仿真次数
+    int finalTime;   // the final time
+    double stepSize; // the step size
+    int stepCout;    // simulate count
 }Timing;
 
 #pragma pack()
