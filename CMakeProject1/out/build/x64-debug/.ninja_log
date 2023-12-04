@@ -1,17 +1,11 @@
 # ninja log v5
-390	505	7233730655153894	E:/project/match/CMakeProject1/bin/PROJECT1.exe	41f2743e91536b6e
-3	262	7233723753607955	CMakeFiles/PROJECT1.dir/main.cpp.obj	ac312e485e5ef41b
-445	616	7227550718300421	CMakeProject1/CMakeProject1.exe	310c19f241796a55
-2	444	7227550716849932	CMakeProject1/CMakeFiles/CMakeProject1.dir/CMakeProject1.cpp.obj	5f61c34179076d98
-1	309	7228588582330943	CMakeFiles/PROJECT1.dir/src/matrix.cpp.obj	57ff399c13730b65
-1	390	7233730654376496	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	f9d6b4b4224853dd
-1	5	0	clean	8c45b54705a541e8
-1	381	7233741813927891	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	f9d6b4b4224853dd
-381	529	7233741814999812	E:/project/match/CMakeProject1/bin/PROJECT1.exe	41f2743e91536b6e
-1	380	7233742032373274	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	f9d6b4b4224853dd
-380	492	7233742033120777	E:/project/match/CMakeProject1/bin/PROJECT1.exe	41f2743e91536b6e
-1	456	7233744398124831	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	f9d6b4b4224853dd
-456	602	7233744399164023	E:/project/match/CMakeProject1/bin/PROJECT1.exe	41f2743e91536b6e
-3	268	7233769724275362	CMakeFiles/PROJECT1.dir/main.cpp.obj	ac312e485e5ef41b
-1	382	7233769725391625	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	f9d6b4b4224853dd
-382	508	7233769726234720	E:/project/match/CMakeProject1/bin/PROJECT1.exe	41f2743e91536b6e
+1	271	7233815943754178	CMakeFiles/PROJECT1.dir/src/matrix.cpp.obj	a4eb8d7cf25ee149
+3	403	7233814755791729	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	d6b4c3b47c46df28
+5	285	7233814754615661	CMakeFiles/PROJECT1.dir/main.cpp.obj	a73cff7a4f5ef2dc
+271	398	7233815944576450	E:/project/match/match/CMakeProject1/bin/PROJECT1.exe	a161bbe03998e5e0
+4	275	7233820728257378	CMakeFiles/PROJECT1.dir/main.cpp.obj	a73cff7a4f5ef2dc
+2	394	7233820729433444	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	d6b4c3b47c46df28
+394	541	7233820730396124	E:/project/match/match/CMakeProject1/bin/PROJECT1.exe	27c7a97532e90af6
+3	625	7233852027997940	CMakeFiles/PROJECT1.dir/main.cpp.obj	a73cff7a4f5ef2dc
+1	657	7233852028327217	CMakeFiles/PROJECT1.dir/src/parsejson.cpp.obj	d6b4c3b47c46df28
+657	801	7233852029283636	E:/project/match/match/CMakeProject1/bin/PROJECT1.exe	27c7a97532e90af6

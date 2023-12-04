@@ -4,8 +4,7 @@
 int main()
 {
     MySimulation simuJson;
-    simuJson.initJsonConf();
-    simuJson.displayResult();
+    simuJson.startSimulation();
     simuJson.showData();
     return 0;
 }

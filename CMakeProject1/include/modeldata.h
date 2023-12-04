@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 
+const int MAXNUM = 100;
 
 #pragma pack(1)
 typedef struct ModuleInfo {

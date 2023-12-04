@@ -3,31 +3,30 @@
 #include <ctime>
 
 const std::string MODEL_DATA_JSON_FILE_PATH = "../modelconfig.json";
-const double pi = atan(1.0) * 4;
 
 MySimulation::MySimulation()
 {
-    mVexNum = -1;
+    moduleNumber = -1;
     cycleNum = 0;
     relationshipNum = 0;
     memset(cycle, 0, sizeof(cycle));
     memset(color, 0,sizeof(color));
     memset(adjacentMatrix, 0, sizeof(adjacentMatrix));
 
-    for (auto it : gainModel) {
+    for (auto it : gainModule) {
         it.second.preValue = 0.0;
     }
 
-    for (auto it : sumModel) {
+    for (auto it : sumModule) {
         it.second.preValue = 0.0;
     }
 
-    for (auto it : multModel) {
+    for (auto it : multModule) {
         it.second.preValue = 0;
         it.second.outputValue = 0;
     }
 
-    for (auto it : sineModel) {
+    for (auto it : sineModule) {
         it.second.preValue = 0.0;
     }
     outFile.open("data.csv");
@@ -41,10 +40,9 @@ MySimulation::~MySimulation()
 void MySimulation::dfs( int i)
 {
     color[i] = -1;
-    for (int j = 0; j <= mVexNum; j++) {
+    for (int j = 0; j <= moduleNumber; j++) {
         if (adjacentMatrix[i][j] != 0) {
             if (color[j] == -1) {   //探索到回边,存在环
-                is_DAG = false;     //是有向无环图
                 cycle[cycleNum][0] = i;
                 cycle[cycleNum][1] = j;
                 cycleNum++;
@@ -60,7 +58,7 @@ void MySimulation::dfs( int i)
 void MySimulation::DFS()
 {
     int i;
-    for (i = 0; i <= mVexNum; i++) {
+    for (i = 0; i <= moduleNumber; i++) {
         //如果这个顶点未被访问过，则从i顶点出发进行深度优先遍历  
         if (color[i] == 0) {
             dfs(i);
@@ -68,10 +66,10 @@ void MySimulation::DFS()
     }
 }
 
-void MySimulation::recordVexs(const std::string& name)
+void MySimulation::recordModuleNumber(const std::string& name)
 {
-    mVexNum++;
-    moduleList[mVexNum] = name;
+    moduleNumber++;
+    moduleList[moduleNumber] = name;
 }
 
 void MySimulation::recordRelationship(const std::string& from, const std::string& to) 
@@ -82,7 +80,7 @@ void MySimulation::recordRelationship(const std::string& from, const std::string
 }
 
 
-void MySimulation::parseGainModel(const rapidjson::Document& doc)
+void MySimulation::parseGainModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("gain") && doc["gain"].IsArray()) {
         auto gain_config_arrays = doc["gain"].GetArray();
@@ -91,7 +89,7 @@ void MySimulation::parseGainModel(const rapidjson::Document& doc)
             Gain gainInfo;
             if (gain_config_arrays[i].HasMember("name") && gain_config_arrays[i]["name"].IsString()) {
                 name = gain_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (gain_config_arrays[i].HasMember("value") && gain_config_arrays[i]["value"].IsDouble()) {
@@ -113,12 +111,12 @@ void MySimulation::parseGainModel(const rapidjson::Document& doc)
                     recordRelationship(name, outputName);
                 }
             }
-            gainModel[name] = gainInfo;
+            gainModule[name] = gainInfo;
         }
     }
 }
 
-void MySimulation::parseSumModel(const rapidjson::Document& doc)
+void MySimulation::parseSumModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("sum") && doc["sum"].IsArray()) {
         auto sum_config_arrays = doc["sum"].GetArray();
@@ -127,7 +125,7 @@ void MySimulation::parseSumModel(const rapidjson::Document& doc)
             ModuleInfo sumInfo;
             if (sum_config_arrays[i].HasMember("name") && sum_config_arrays[i]["name"].IsString()) {
                 name = sum_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (sum_config_arrays[i].HasMember("input") && sum_config_arrays[i]["input"].IsArray()) {
@@ -145,12 +143,12 @@ void MySimulation::parseSumModel(const rapidjson::Document& doc)
                     recordRelationship(name, outputName);
                 }
             }
-            sumModel[name] = sumInfo;
+            sumModule[name] = sumInfo;
         }
     }
 }
 
-void MySimulation::parseMultModel(const rapidjson::Document& doc)
+void MySimulation::parseMultModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("mult") && doc["mult"].IsArray()) {
         auto mult_config_arrays = doc["mult"].GetArray();
@@ -159,7 +157,7 @@ void MySimulation::parseMultModel(const rapidjson::Document& doc)
             ModuleInfo multInfo;
             if (mult_config_arrays[i].HasMember("name") && mult_config_arrays[i]["name"].IsString()) {
                 name = mult_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (mult_config_arrays[i].HasMember("input") && mult_config_arrays[i]["input"].IsArray()) {
@@ -177,12 +175,12 @@ void MySimulation::parseMultModel(const rapidjson::Document& doc)
                     recordRelationship(name, outputName);
                 }
             }
-            multModel[name] = multInfo;
+            multModule[name] = multInfo;
         }
     }
 }
 
-void MySimulation::parseConsModel(const rapidjson::Document& doc)
+void MySimulation::parseConsModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("cons") && doc["cons"].IsArray()) {
         auto cons_config_arrays = doc["cons"].GetArray();
@@ -191,7 +189,7 @@ void MySimulation::parseConsModel(const rapidjson::Document& doc)
             Cons consInfo;
             if (cons_config_arrays[i].HasMember("name") && cons_config_arrays[i]["name"].IsString()) {
                 name = cons_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (cons_config_arrays[i].HasMember("value") && cons_config_arrays[i]["value"].IsDouble()) {
@@ -206,12 +204,12 @@ void MySimulation::parseConsModel(const rapidjson::Document& doc)
                     recordRelationship(name, outputName);
                 }
             }
-            consModel[name] = consInfo;
+            consModule[name] = consInfo;
         }
     }
 }
 
-void MySimulation::parseSineModel(const rapidjson::Document& doc)
+void MySimulation::parseSineModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("sine") && doc["sine"].IsArray()) {
         auto sine_config_arrays = doc["sine"].GetArray();
@@ -220,7 +218,7 @@ void MySimulation::parseSineModel(const rapidjson::Document& doc)
             Sine sineInfo;
             if (sine_config_arrays[i].HasMember("name") && sine_config_arrays[i]["name"].IsString()) {
                 name = sine_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (sine_config_arrays[i].HasMember("value") && sine_config_arrays[i]["value"].IsDouble()) {
@@ -235,12 +233,12 @@ void MySimulation::parseSineModel(const rapidjson::Document& doc)
                     recordRelationship(name, outputName);
                 }
             }
-            sineModel[name] = sineInfo;
+            sineModule[name] = sineInfo;
         }
     }
 }
 
-void MySimulation::parseDspModel(const rapidjson::Document& doc)
+void MySimulation::parseDspModule(const rapidjson::Document& doc)
 {
     if (doc.HasMember("disp") && doc["disp"].IsArray()) {
         auto disp_config_arrays = doc["disp"].GetArray();
@@ -249,7 +247,7 @@ void MySimulation::parseDspModel(const rapidjson::Document& doc)
             Disp dispInfo;
             if (disp_config_arrays[i].HasMember("name") && disp_config_arrays[i]["name"].IsString()) {
                 name = disp_config_arrays[i]["name"].GetString();
-                recordVexs(name);
+                recordModuleNumber(name);
             }
 
             if (disp_config_arrays[i].HasMember("input") && disp_config_arrays[i]["input"].IsArray()) {
@@ -258,7 +256,7 @@ void MySimulation::parseDspModel(const rapidjson::Document& doc)
                     dispInfo.input[outputArray[j].GetString()] = 0;
                 }
             }
-            dispModel[name] = dispInfo;
+            dispModule[name] = dispInfo;
         }
     }
 }
@@ -282,7 +280,7 @@ void MySimulation::parseStepSize(const rapidjson::Document& doc)
     }
 }
 
-bool MySimulation::initJsonConf()
+bool MySimulation::parseJsonConf()
 {
     std::ifstream ifs(MODEL_DATA_JSON_FILE_PATH.c_str());
     if (!ifs.is_open()) {
@@ -296,20 +294,21 @@ bool MySimulation::initJsonConf()
         std::cout << "parse error: " << doc.GetParseError() << std::endl;
         return false;
     }
-    parseSineModel(doc);
-    parseConsModel(doc);
-    parseSumModel(doc);
-    parseGainModel(doc);
-    parseMultModel(doc);
-    parseDspModel(doc);
+    parseSineModule(doc);
+    parseConsModule(doc);
+    parseSumModule(doc);
+    parseGainModule(doc);
+    parseMultModule(doc);
+    parseDspModule(doc);
     parseStepSize(doc);
+    ifs.close();
     creatAdjacentMatrix();
     return true;
 }
 
-int MySimulation::getPosition(std::string moduleName)
+int MySimulation::getModulePosition(std::string moduleName)
 {
-    for (int i = 0; i <= mVexNum; i++) {
+    for (int i = 0; i <= moduleNumber; i++) {
         if (moduleList[i] == moduleName) {
             return i;
         }
@@ -319,30 +318,30 @@ int MySimulation::getPosition(std::string moduleName)
 void MySimulation::creatAdjacentMatrix()
 {
     for (int i = 0; i < relationshipNum; i++) {
-        int from = getPosition(relationship[i][0]);
-        int to = getPosition(relationship[i][1]);
+        int from = getModulePosition(relationship[i][0]);
+        int to = getModulePosition(relationship[i][1]);
         adjacentMatrix[from][to] = 1;
     }
 }
 
-double MySimulation::startSimulation(std::string lastModel, double sinValue, bool getPreValue)
+double MySimulation::calculateSimulationResult(std::string lastModel, double sinValue, bool getPreValue)
 {
     if (lastModel.find("cons") != std::string::npos) {
-        consModel[lastModel].outputValue = consModel[lastModel].consValue;
-        std::cout << lastModel << ":" << consModel[lastModel].outputValue << std::endl;
-        return consModel[lastModel].outputValue;
+        consModule[lastModel].outputValue = consModule[lastModel].consValue;
+        std::cout << lastModel << ":" << consModule[lastModel].outputValue << std::endl;
+        return consModule[lastModel].outputValue;
     }
 
     if (lastModel.find("sum") != std::string::npos) {
         if (getPreValue) {
-            return sumModel[lastModel].outputValue;
+            return sumModule[lastModel].outputValue;
         }
         int j = 0;
         for (j; j < 2; j++) {
             bool isCycle = false;
 
             for (int i = 0; i < cycleNum; i++) {
-                if (moduleList[cycle[i][1]] == lastModel && sumModel[lastModel].input[j] == moduleList[cycle[i][0]]) {
+                if (moduleList[cycle[i][1]] == lastModel && sumModule[lastModel].input[j] == moduleList[cycle[i][0]]) {
                     isCycle = true;
                     break;
                 }
@@ -354,41 +353,43 @@ double MySimulation::startSimulation(std::string lastModel, double sinValue, boo
         }
 
         if (j == 2) {
-            sumModel[lastModel].outputValue = startSimulation(sumModel[lastModel].input[0], sinValue, false) +
-                startSimulation(sumModel[lastModel].input[1], sinValue, false);
+            sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, false) +
+                calculateSimulationResult(sumModule[lastModel].input[1], sinValue, false);
         }
         else if (j == 0) {
-            sumModel[lastModel].outputValue = startSimulation(sumModel[lastModel].input[0], sinValue, true) +
-                startSimulation(sumModel[lastModel].input[1], sinValue, false);
+            sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, true) +
+                calculateSimulationResult(sumModule[lastModel].input[1], sinValue, false);
         }
         else {
-            sumModel[lastModel].outputValue = startSimulation(sumModel[lastModel].input[0], sinValue, false) +
-                startSimulation(sumModel[lastModel].input[1], sinValue, true);
+            sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, false) +
+                calculateSimulationResult(sumModule[lastModel].input[1], sinValue, true);
         }
-        std::cout << lastModel << ":" << sumModel[lastModel].outputValue << std::endl;
-        return sumModel[lastModel].outputValue;
+        std::cout << lastModel << ":" << sumModule[lastModel].outputValue << std::endl;
+        return sumModule[lastModel].outputValue;
     }
 
     if (lastModel.find("gain") != std::string::npos) {
         if (getPreValue) {
-            return gainModel[lastModel].outputValue;
+            return gainModule[lastModel].outputValue;
         }
-        gainModel[lastModel].outputValue = gainModel[lastModel].gainValue * startSimulation(gainModel[lastModel].info.input[0], sinValue, false);
-        std::cout << lastModel << ":" << gainModel[lastModel].outputValue << std::endl;
-        return gainModel[lastModel].outputValue;
+        gainModule[lastModel].outputValue = gainModule[lastModel].gainValue * calculateSimulationResult(gainModule[lastModel].info.input[0], sinValue, false);
+        std::cout << lastModel << ":" << gainModule[lastModel].outputValue << std::endl;
+        return gainModule[lastModel].outputValue;
     }
 
     if (lastModel.find("sine") != std::string::npos) {
+        // using the rad
+        //const double pi = atan(1.0) * 4;
         //sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue * pi / 180);
-        sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue);
-        std::cout << lastModel<< " : " << sinValue << " : " << sineModel[lastModel].outputValue << std::endl;
-        return sineModel[lastModel].outputValue;
+        sineModule[lastModel].outputValue = sineModule[lastModel].sineValue * sin(sinValue);
+        std::cout << lastModel<< " : " << sinValue << " : " << sineModule[lastModel].outputValue << std::endl;
+        return sineModule[lastModel].outputValue;
     }
 
     if (lastModel.find("mult") != std::string::npos) {
         if (getPreValue) {
-            std::cout << lastModel << ":" << multModel[lastModel].outputValue << std::endl;
-            return multModel[lastModel].outputValue;
+            std::cout << lastModel << ":" << multModule[lastModel].outputValue << std::endl;
+            return multModule[lastModel].outputValue;
         }
 
         int j = 0;
@@ -396,7 +397,7 @@ double MySimulation::startSimulation(std::string lastModel, double sinValue, boo
         for (j; j < 2; j++) {
             bool isCycle = false;
             for (int i = 0; i < cycleNum; i++) {
-                if (moduleList[cycle[i][1]] == lastModel && multModel[lastModel].input[j] == moduleList[cycle[i][0]]) {
+                if (moduleList[cycle[i][1]] == lastModel && multModule[lastModel].input[j] == moduleList[cycle[i][0]]) {
                     isCycle = true;
                     break;
                 }
@@ -406,43 +407,24 @@ double MySimulation::startSimulation(std::string lastModel, double sinValue, boo
             }
         }
         if (j == 2) {
-            multModel[lastModel].outputValue = startSimulation(multModel[lastModel].input[0], sinValue, false) *
-                startSimulation(multModel[lastModel].input[1], sinValue, false);
+            multModule[lastModel].outputValue = calculateSimulationResult(multModule[lastModel].input[0], sinValue, false) *
+                calculateSimulationResult(multModule[lastModel].input[1], sinValue, false);
         } else if (j == 0) {
-            multModel[lastModel].outputValue = startSimulation(multModel[lastModel].input[0], sinValue, true) *
-                startSimulation(multModel[lastModel].input[1], sinValue, false);
+            multModule[lastModel].outputValue = calculateSimulationResult(multModule[lastModel].input[0], sinValue, true) *
+                calculateSimulationResult(multModule[lastModel].input[1], sinValue, false);
         } else {
-            multModel[lastModel].outputValue = startSimulation(multModel[lastModel].input[0], sinValue, false) *
-                startSimulation(multModel[lastModel].input[1], sinValue, true);
+            multModule[lastModel].outputValue = calculateSimulationResult(multModule[lastModel].input[0], sinValue, false) *
+                calculateSimulationResult(multModule[lastModel].input[1], sinValue, true);
         }
-        std::cout << lastModel << ":" << multModel[lastModel].outputValue << std::endl;
-        return multModel[lastModel].outputValue;
+        std::cout << lastModel << ":" << multModule[lastModel].outputValue << std::endl;
+        return multModule[lastModel].outputValue;
     }
 }
 
-void MySimulation::setPreValue()
+void MySimulation::startSimulation()
 {
-    for (auto it : gainModel) {
-        it.second.preValue = it.second.outputValue;
-    }
+    parseJsonConf();
 
-    for (auto it : sumModel) {
-        std::cout << it.second.preValue << " : " << it.second.outputValue << std::endl;
-        it.second.preValue = it.second.outputValue;
-        std::cout << it.second.preValue << " : " << it.second.outputValue << std::endl;
-    }
-
-    for (auto it : multModel) {
-        it.second.preValue = it.second.outputValue;
-    }
-
-    for (auto it : sineModel) {
-        it.second.preValue = it.second.outputValue;
-    }
-}
-
-void MySimulation::displayResult()
-{
     DFS();
     long long stepCount = 0;
     time_t rawtime;
@@ -452,11 +434,10 @@ void MySimulation::displayResult()
     std::cout << "当前时间: " << asctime(timeinfo) << "  finalTime: " << step.finalTime << "  stepSize: " << step.stepSize << std::endl;
     long long stepNum = step.finalTime / step.stepSize;
     while(stepCount <= stepNum) {
-        setPreValue();
         std::cout << "第" << stepCount << "步" << std::endl;
-        for (auto it : dispModel) {
+        for (auto it : dispModule) {
             for (auto input : it.second.input) {
-                outFile << startSimulation(input.first, stepCount * step.stepSize, false) << std::endl;
+                outFile << calculateSimulationResult(input.first, stepCount * step.stepSize, false) << std::endl;
             }
         }
         stepCount++;
@@ -466,7 +447,7 @@ void MySimulation::displayResult()
 
 void MySimulation::showData()
 {
-    for (auto it : gainModel) {
+    for (auto it : gainModule) {
         std::cout << "gain name: " << it.first << std::endl;
         for (int i = 0; i < size(it.second.info.input); i++) {
             std::cout << "    input: " << it.second.info.input[i] << std::endl;
@@ -477,7 +458,7 @@ void MySimulation::showData()
         }
     }
 
-    for (auto it : sumModel) {
+    for (auto it : sumModule) {
         std::cout << "sum name: " << it.first << std::endl;
         for (int i = 0; i < size(it.second.input); i++) {
             std::cout << "    input: " << it.second.input[i] << std::endl;
@@ -488,7 +469,7 @@ void MySimulation::showData()
     }
 
 
-    for (auto it : multModel) {
+    for (auto it : multModule) {
         std::cout << "mult name: " << it.first << std::endl;
         for (int i = 0; i < size(it.second.input); i++) {
             std::cout << "    input: " << it.second.input[i] << std::endl;
@@ -499,7 +480,7 @@ void MySimulation::showData()
     }
 
 
-    for (auto it : sineModel) {
+    for (auto it : sineModule) {
         std::cout << "sine name: " << it.first << std::endl;
         for (auto output : it.second.output) {
             std::cout << "    output: " << output.first << " " << output.second << std::endl;
@@ -508,7 +489,7 @@ void MySimulation::showData()
     }
 
 
-    for (auto it : consModel) {
+    for (auto it : consModule) {
         std::cout << "cons name: " << it.first << std::endl;
         for (auto output : it.second.output) {
             std::cout << "    output: " << output.first << " " << output.second << std::endl;
@@ -517,7 +498,7 @@ void MySimulation::showData()
     }
 
 
-    for (auto it : dispModel) {
+    for (auto it : dispModule) {
         std::cout << "disp name: " << it.first << std::endl;
         for (auto input : it.second.input) {
             std::cout << "    input: " << input.first << " " << input.second << std::endl;
@@ -526,7 +507,7 @@ void MySimulation::showData()
     std::cout << "step: " << step.stepCout << std::endl;
 
     std::cout << "*********************\n\n" << std::endl;
-    for (int i = 0; i <= mVexNum; i++) {
+    for (int i = 0; i <= moduleNumber; i++) {
         std::cout << moduleList[i] << std::endl;
     }
     std::cout << "*********************\n\n" << std::endl;
@@ -535,13 +516,13 @@ void MySimulation::showData()
     }
 
     std::cout << "***********moduleList**********\n\n     adjacentMatrix:" << std::endl;
-    for (int k = 0; k <= mVexNum; k++) {
+    for (int k = 0; k <= moduleNumber; k++) {
         std::cout << moduleList[k] << "  ";
     }
     std::cout << std::endl;;
-    for (int i = 0; i <= mVexNum; i++) {
+    for (int i = 0; i <= moduleNumber; i++) {
         std::cout << moduleList[i] << ": ";
-        for (int j = 0; j <= mVexNum; j++) {
+        for (int j = 0; j <= moduleNumber; j++) {
             std::cout << adjacentMatrix[i][j] << "  ";
         }
         std::cout << "          " << std::endl;

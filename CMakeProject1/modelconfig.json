@@ -37,7 +37,7 @@
   "cons": [
     {
       "name": "cons1",
-      "value": 1.0,
+      "value": 0.5,
       "output": [ "sum1" ]
     }
   ],
