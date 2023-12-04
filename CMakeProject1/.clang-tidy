@@ -1,0 +1,139 @@
+﻿Checks: '-*,
+         readability-identifier-naming,
+         readability-function-size,
+         readability-braces-around-statements,
+         readability-magic-numbers,
+         misc-unused-parameters,
+         modernize-use-nullptr,
+         modernize-replace-auto-ptr,
+         modernize-use-noexcept,
+         modernize-use-override,
+         performance-move-const-arg,
+         cppcoreguidelines-pro-type-cstyle-cast,
+         cppcoreguidelines-misleading-capture-default-by-value,
+         abseil-no-internal-dependencies,
+         bugprone-exception-escape,
+         bugprone-forwarding-reference-overload,
+         bugprone-lambda-function-name,
+         bugprone-sizeof-container,
+         bugprone-switch-missing-default-case,
+         clang-analyzer-core.DivideZero,
+         clang-analyzer-core.NonNullParamChecker,
+         clang-analyzer-core.NullDereference,
+         clang-analyzer-osx.NumberObjectConversion,
+         concurrency-mt-unsafe,
+         cppcoreguidelines-avoid-const-or-ref-data-members,
+         cppcoreguidelines-init-variables,
+         cppcoreguidelines-misleading-capture-default-by-value,
+         cppcoreguidelines-pro-type-const-cast,
+         cppcoreguidelines-pro-type-static-cast-downcast,
+         google-build-namespaces,
+         google-build-using-namespace,
+         google-explicit-constructor,
+         google-global-names-in-headers,
+         google-readability-todo,
+         llvm-namespace-comment,
+         llvm-prefer-isa-or-dyn-cast-in-conditionals,
+         misc-header-include-cycle,
+         misc-include-cleaner,
+         misc-new-delete-overloads,
+         misc-non-private-member-variables-in-classes,
+         misc-unused-using-decls,
+         misc-use-anonymous-namespace,
+         modernize-use-auto,
+         portability-std-allocator-const,
+         readability-avoid-const-params-in-decls,
+         readability-avoid-unconditional-preprocessor-if,
+         readability-braces-around-statements,
+         readability-const-return-type,
+         readability-delete-null-pointer,
+         readability-duplicate-include,
+         readability-else-after-return,
+         readability-implicit-bool-conversion,
+         readability-inconsistent-declaration-parameter-name,
+         readability-isolate-declaration,
+         readability-make-member-function-const,
+         readability-misleading-indentation,
+         readability-misplaced-array-index,
+         readability-named-parameter,
+         readability-non-const-parameter,
+         readability-operators-representation,
+         readability-qualified-auto,
+         readability-redundant-control-flow,
+         readability-redundant-declaration,
+         readability-redundant-function-ptr-dereference,
+         readability-redundant-member-init,
+         readability-redundant-preprocessor,
+         readability-redundant-smartptr-get,
+         readability-redundant-string-init,
+         readability-simplify-boolean-expr,
+         readability-simplify-subscript-expr,
+         readability-static-accessed-through-instance,
+         readability-static-definition-in-anonymous-namespace,
+         readability-string-compare,
+         readability-uniqueptr-delete-release,
+         readability-uppercase-literal-suffix,
+         clang-analyzer-osx.cocoa.UnusedIvars,
+         bugprone-unused-return-value,
+         bugprone-forward-declaration-namespace,
+         modernize-concat-nested-namespaces,
+         modernize-use-nullptr,
+         google-objc-avoid-throwing-exception,
+         cppcoreguidelines-pro-type-member-init,
+         modernize-use-equals-delete,
+         cppcoreguidelines-pro-type-const-cast'
+CheckOptions:
+  - key:             readability-identifier-naming.ClassCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.StructCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.TypedefCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.EnumCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.EnumConstantCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.UnionCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.NamespaceCase
+    value:           camelBack
+  - key:             readability-identifier-naming.FunctionCase
+    value:           camelBack
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.GlobalVariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ConstantCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.GlobalConstantCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.MacroDefinitionCase
+    value:           UPPER_CASE
+  - key:             readability-identifier-naming.MacroDefinitionIgnoredRegexp
+    value:           .*_H_$|.*_H__$
+  - key:             readability-identifier-naming.ClassMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.PublicMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.PrivateMemberPrefix
+    value:           m_
+  - key:             readability-identifier-naming.PrivateMemberIgnoredRegexp  
+    value:           ^d_ptr|q_ptr$
+  - key:             readability-function-size.StatementThreshold
+    value:           40
+  - key:             misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value:           true
+  - key:             misc-include-cleaner.DeduplicateFindings
+    value:           true
+  - key:             google-build-namespaces.HeaderFileExtensions
+    value:           h,hh,hpp,hxx
+  - key:             readability-function-cognitive-complexity.Threshold
+    value:           5
+  - key:             readability-identifier-naming.EnumConstantPrefix
+    value:           k
+  - key:             readability-identifier-naming.GlobalVariablePrefix
+    value:           g_
+  - key:             readability-identifier-naming.GlobalConstantPrefix
+    value:           g_
+  - key:             readability-identifier-naming.ParameterCase
+    value:           lower_case
