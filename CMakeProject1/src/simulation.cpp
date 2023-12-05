@@ -1,16 +1,33 @@
 ﻿#include "simulation.h"
 #include <cmath>
 
-const std::string MODEL_DATA_JSON_FILE_PATH = "../modelconfig.json";
+const std::string g_model_data_json_file = "../modelconfig.json";
 
 MySimulation::MySimulation()
 {
-    m_moduleNumber = -1;
-    m_cycleNum = 0;
-    m_relationshipNum = 0;
+    m_step.final_time = -1;  // the simulation is not stop
+    m_step.step_size = 1;    // init the step size is 1.
+    m_gainModule.clear();
+    m_sumModule.clear();
+    m_multModule.clear();
+    m_sineModule.clear();
+    m_consModule.clear();
+    m_dispModule.clear();
+
+    m_cycleNum = 0;         // has not cycle.
     memset(m_cycle, 0, sizeof(m_cycle));
-    memset(m_color, 0,sizeof(m_color));
+
+    memset(m_color, 0, sizeof(m_color));
+
     memset(m_adjacentMatrix, 0, sizeof(m_adjacentMatrix));
+
+    m_moduleNumber = -1;    // has no module.
+    m_moduleList->clear();
+
+    m_relationshipNum = 0;  // has no relationship.
+    m_relationship[0]->clear();
+    m_relationship[1]->clear();
+
     m_outFile.open("data.csv");
 }
 
@@ -19,12 +36,12 @@ MySimulation::~MySimulation()
     m_outFile.close();
 }
 
-void MySimulation::dfs( int i)
+void MySimulation::dfs(int i)
 {
     m_color[i] = -1;
     for (int j = 0; j <= m_moduleNumber; j++) {
         if (m_adjacentMatrix[i][j] != 0) {
-            if (m_color[j] == -1) {   //探索到回边,存在环
+            if (m_color[j] == -1) { // 探索到回边,存在环
                 m_cycle[m_cycleNum][0] = i;
                 m_cycle[m_cycleNum][1] = j;
                 m_cycleNum++;
@@ -33,7 +50,7 @@ void MySimulation::dfs( int i)
             }
         }
     }
-    m_color[i] = 1;//表示i的后裔节点都被访问过  
+    m_color[i] = 1; // 表示i的后裔节点都被访问过
 }
 
 // 深度优先搜索
@@ -41,7 +58,7 @@ void MySimulation::startDfs()
 {
     int i;
     for (i = 0; i <= m_moduleNumber; i++) {
-        //如果这个顶点未被访问过，则从i顶点出发进行深度优先遍历  
+        // 如果这个顶点未被访问过，则从i顶点出发进行深度优先遍历
         if (m_color[i] == 0) {
             dfs(i);
         }
@@ -54,13 +71,12 @@ void MySimulation::recordModuleNumber(const std::string& name)
     m_moduleList[m_moduleNumber] = name;
 }
 
-void MySimulation::recordRelationship(const std::string& from, const std::string& to) 
+void MySimulation::recordRelationship(const std::string& from, const std::string& to)
 {
     m_relationship[m_relationshipNum][0] = from;
     m_relationship[m_relationshipNum][1] = to;
     m_relationshipNum++;
 }
-
 
 void MySimulation::parseGainModule(const rapidjson::Document& doc)
 {
@@ -261,7 +277,7 @@ void MySimulation::parseStepSize(const rapidjson::Document& doc)
 
 bool MySimulation::parseJsonConf()
 {
-    std::ifstream ifs(MODEL_DATA_JSON_FILE_PATH.c_str());
+    std::ifstream ifs(g_model_data_json_file.c_str());
     if (!ifs.is_open()) {
         std::cout << "open error" << std::endl;
         return false;
@@ -273,6 +289,7 @@ bool MySimulation::parseJsonConf()
         std::cout << "parse error: " << doc.GetParseError() << std::endl;
         return false;
     }
+
     parseSineModule(doc);
     parseConsModule(doc);
     parseSumModule(doc);
@@ -280,6 +297,7 @@ bool MySimulation::parseJsonConf()
     parseMultModule(doc);
     parseDspModule(doc);
     parseStepSize(doc);
+
     ifs.close();
     if (!moduleValidityCheck()) {
         std::cout << "\033[31m: module check failed, please check the modelconfig.json!!!\033[0m" << std::endl;
@@ -312,56 +330,62 @@ void MySimulation::creatAdjacentMatrix()
 
 double MySimulation::calculateSimulationResult(std::string lastModel, double sinValue, bool getPreValue)
 {
-    if (lastModel.find("cons") != std::string::npos) {
+    if (lastModel.find("cons") != std::string::npos) { // the cons is not be cycle. return the value.
         m_consModule[lastModel].output_value = m_consModule[lastModel].cons_value;
         return m_consModule[lastModel].output_value;
     }
 
     if (lastModel.find("sum") != std::string::npos) {
-        if (getPreValue) {
+        if (getPreValue) { // if it is the star of cycle.
             return m_sumModule[lastModel].output_value;
         }
         int j = 0;
-        for (j; j < 2; j++) {
+        for (j; j < 2; j++) {  // search the input of sum.
             bool isCycle = false;
 
             for (int i = 0; i < m_cycleNum; i++) {
-                if (m_moduleList[m_cycle[i][1]] == lastModel && m_sumModule[lastModel].input[j] == m_moduleList[m_cycle[i][0]]) {
-                    isCycle = true;
+                if (m_moduleList[m_cycle[i][1]] == lastModel
+                    && m_sumModule[lastModel].input[j] == m_moduleList[m_cycle[i][0]]) {
+                    isCycle = true;  // it is cycle.
                     break;
                 }
             }
-            if (isCycle) {
+            if (isCycle) { // has cycle, break.
                 break;
-            } 
-
+            }
         }
 
-        if (j == 2) {
-            m_sumModule[lastModel].output_value = calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false) +
-                calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, false);
-        } else if (j == 0) {
-            m_sumModule[lastModel].output_value = calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, true) +
-                calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, false);
-        } else {
-            m_sumModule[lastModel].output_value = calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false) +
-                calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, true);
+        if (j == 2) { // the sum is not the cycle.
+            m_sumModule[lastModel].output_value =
+                    calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false)
+                    + calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, false);
+        } else if (j == 0) { // the sum cycle with input 0
+            m_sumModule[lastModel].output_value =
+                    calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, true)
+                    + calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, false);
+        } else { // the sum cycle with input 1
+            m_sumModule[lastModel].output_value =
+                    calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false)
+                    + calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, true);
         }
         return m_sumModule[lastModel].output_value;
     }
 
     if (lastModel.find("gain") != std::string::npos) {
-        if (getPreValue) {
+        if (getPreValue) { // if the gain is the start of cycle.
             return m_gainModule[lastModel].output_value;
         }
-        m_gainModule[lastModel].output_value = m_gainModule[lastModel].gain_value * calculateSimulationResult(m_gainModule[lastModel].info.input[0], sinValue, false);
+        // the gain output = the input * gain value;
+        m_gainModule[lastModel].output_value = m_gainModule[lastModel].gain_value
+                * calculateSimulationResult(m_gainModule[lastModel].info.input[0], sinValue, false);
         return m_gainModule[lastModel].output_value;
     }
 
     if (lastModel.find("sine") != std::string::npos) {
-        // using the rad
-        //const double pi = atan(1.0) * 4;
-        //sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue * pi / 180);
+        // using the rad. if need use.
+        // const double pi = atan(1.0) * 4;
+        // sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue * pi / 180);
+        // the sine value is the count of step * simulation step.
         m_sineModule[lastModel].output_value = m_sineModule[lastModel].sine_value * sin(sinValue);
         return m_sineModule[lastModel].output_value;
     }
@@ -376,7 +400,8 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
         for (j; j < 2; j++) {
             bool isCycle = false;
             for (int i = 0; i < m_cycleNum; i++) {
-                if (m_moduleList[m_cycle[i][1]] == lastModel && m_multModule[lastModel].input[j] == m_moduleList[m_cycle[i][0]]) {
+                if (m_moduleList[m_cycle[i][1]] == lastModel
+                    && m_multModule[lastModel].input[j] == m_moduleList[m_cycle[i][0]]) {
                     isCycle = true;
                     break;
                 }
@@ -386,14 +411,17 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
             }
         }
         if (j == 2) {
-            m_multModule[lastModel].output_value = calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false) *
-                calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, false);
+            m_multModule[lastModel].output_value =
+                    calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false)
+                    * calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, false);
         } else if (j == 0) {
-            m_multModule[lastModel].output_value = calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, true) *
-                calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, false);
+            m_multModule[lastModel].output_value =
+                    calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, true)
+                    * calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, false);
         } else {
-            m_multModule[lastModel].output_value = calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false) *
-                calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, true);
+            m_multModule[lastModel].output_value =
+                    calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false)
+                    * calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, true);
         }
         return m_multModule[lastModel].output_value;
     }
@@ -408,7 +436,7 @@ void MySimulation::startSimulation()
     startDfs();
     long long stepCount = 0;
     long long stepNum = m_step.final_time / m_step.step_size;
-    while(stepCount <= stepNum) {
+    while (stepCount - stepNum) {
         for (auto it : m_dispModule) {
             for (auto input : it.second.input) {
                 m_outFile << calculateSimulationResult(input.first, stepCount * m_step.step_size, false) << std::endl;
@@ -417,7 +445,6 @@ void MySimulation::startSimulation()
         stepCount++;
     }
 }
-
 
 bool MySimulation::ioCheck(const std::string* ioList, const int listSize)
 {
@@ -433,7 +460,6 @@ bool MySimulation::ioCheck(const std::string* ioList, const int listSize)
     }
     return ret;
 }
-
 
 bool MySimulation::checkGain()
 {
@@ -560,12 +586,20 @@ bool MySimulation::checkDisp()
     return ret;
 }
 
+bool MySimulation::checkStep() 
+{
+    const double eps = 1e-6;
+    if (fabs(m_step.step_size - 0.0) < eps) {
+        std::cout << "\033[31m: the step_size is invalid!!!\033[0m" << std::endl;
+        return false;
+    }
+    return true;
+}
 
 bool MySimulation::moduleValidityCheck()
 {
-    return  checkGain() && checkSum() && checkMult() && checkDisp() && checkSine();
+    return checkGain() && checkSum() && checkMult() && checkDisp() && checkSine() && checkStep();
 }
-
 
 void MySimulation::showData()
 {
@@ -578,17 +612,17 @@ void MySimulation::showData()
         if (m_moduleList[i].length() > maxLen) {
             maxLen = m_moduleList[i].length();
         }
-        std::cout << "\033[36m*****                \033[0m" <<  m_moduleList[i] << std::endl;
+        std::cout << "\033[36m*****                \033[0m" << m_moduleList[i] << std::endl;
     }
     std::cout << "\033[36m***********************module list***********************\033[0m" << std::endl << std::endl;
 
-
     std::cout << "\033[34m***********************module relationship***********************\033[0m" << std::endl;
     for (int i = 0; i < m_relationshipNum; i++) {
-        std::cout <<"\033[34m*****                \033[0m" << m_relationship[i][0] << ", "<< m_relationship[i][1] << std::endl;
+        std::cout << "\033[34m*****                \033[0m" << m_relationship[i][0] << ", " << m_relationship[i][1]
+                  << std::endl;
     }
-    std::cout << "\033[34m***********************module relationship***********************\033[0m" << std::endl << std::endl;
-
+    std::cout << "\033[34m***********************module relationship***********************\033[0m" << std::endl
+              << std::endl;
 
     std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl;
     for (auto it : m_gainModule) {
@@ -602,7 +636,8 @@ void MySimulation::showData()
     for (auto it : m_sineModule) {
         std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.sine_value << std::endl;
     }
-    std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl << std::endl;
+    std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl
+              << std::endl;
 
     std::cout << "\033[32m***********************adjacentMatrix***********************\033[0m" << std::endl;
     std::cout << "\033[32m*****       \033[0m";
@@ -616,10 +651,11 @@ void MySimulation::showData()
         }
         std::cout << m_moduleList[k] << "  ";
     }
-    std::cout <<"\033[32m   *****\033[0m" << std::endl;;
+    std::cout << "\033[32m   *****\033[0m" << std::endl;
+    ;
 
     for (int i = 0; i <= m_moduleNumber; i++) {
-        std::cout<< "\033[32m*****       \033[0m" << m_moduleList[i];
+        std::cout << "\033[32m*****       \033[0m" << m_moduleList[i];
         for (int x = 0; x < (9 - m_moduleList[i].length()); x++) {
             std::cout << " ";
         }
@@ -632,8 +668,11 @@ void MySimulation::showData()
 
         std::cout << "\033[32m    *****\033[0m" << std::endl;
     }
-    std::cout << "\033[32m***********************adjacentMatrix***********************\033[0m" << std::endl << std::endl;
+    std::cout << "\033[32m***********************adjacentMatrix***********************\033[0m" << std::endl
+              << std::endl;
     for (int i = 0; i < m_cycleNum; i++) {
-        std::cout << "\033[33m环在" << "from: [" << m_moduleList[m_cycle[i][0]] << "]  to: [" << m_moduleList[m_cycle[i][1]] << "]\033[0m" << std::endl;
+        std::cout << "\033[33m环在"
+                  << "from: [" << m_moduleList[m_cycle[i][0]] << "]  to: [" << m_moduleList[m_cycle[i][1]] << "]\033[0m"
+                  << std::endl;
     }
 }

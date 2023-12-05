@@ -55,8 +55,8 @@ private:
     MySimulation();                                           // external construction prohibited.
     ~MySimulation();                                          // prohibit external destruction.
     MySimulation(const MySimulation& my_simulation) = delete; // prohibit external copy constructs.
-    const MySimulation&
-    operator=(const MySimulation& my_simulation) = delete; // disable external assignment operations.
+     // disable external assignment operations.
+    const MySimulation& operator=(const MySimulation& my_simulation) = delete; 
 
     /** 
      * @brief     : parse the module infomation.
@@ -97,6 +97,8 @@ private:
     bool checkMult();
     bool checkDisp();
     bool checkSine();
+    bool checkStep();
+
     /** 
      * @brief     : check the input/output validity of the model.
      * @author    : yongping.duan@keliangtek
@@ -209,6 +211,7 @@ public:
         static MySimulation my_simulation;
         return my_simulation;
     }
+
     /* debug ,show the data*/
     void showData();
 
