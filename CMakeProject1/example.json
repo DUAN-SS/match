@@ -16,8 +16,22 @@
     },
     {
       "name": "sum2",
-      "input": ["sum1", "gain1"],
-      "output": ["disp1", "sum1"]
+      "input": [ "sum1", "gain1" ],
+      "output": [ "disp1", "sum1" ]
+    }
+  ],
+  "mult": [
+    {
+      "name": "mult1",
+      "input": [ "null", "null" ],
+      "output": [ "null", "null" ]
+    }
+  ],
+  "sine": [
+    {
+      "name": "sine1",
+      "value": 3.0,
+      "output": [ "null" ]
     }
   ],
   "cons": [

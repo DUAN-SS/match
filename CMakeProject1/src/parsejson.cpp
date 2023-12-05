@@ -285,6 +285,10 @@ bool MySimulation::parseJsonConf()
     parseDspModule(doc);
     parseStepSize(doc);
     ifs.close();
+    if (!moduleValidityCheck()) {
+        std::cout << "\033[31m: module check failed, please check the modelconfig.json!!!\033[0m" << std::endl;
+        return false;
+    }
     creatAdjacentMatrix();
     return true;
 }
@@ -338,12 +342,10 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
         if (j == 2) {
             sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, false) +
                 calculateSimulationResult(sumModule[lastModel].input[1], sinValue, false);
-        }
-        else if (j == 0) {
+        } else if (j == 0) {
             sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, true) +
                 calculateSimulationResult(sumModule[lastModel].input[1], sinValue, false);
-        }
-        else {
+        } else {
             sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, false) +
                 calculateSimulationResult(sumModule[lastModel].input[1], sinValue, true);
         }
@@ -406,7 +408,9 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
 
 void MySimulation::startSimulation()
 {
-    parseJsonConf();
+    if (!parseJsonConf()) {
+        return;
+    }
 
     DFS();
     long long stepCount = 0;
@@ -426,6 +430,149 @@ void MySimulation::startSimulation()
         stepCount++;
     }
 
+}
+
+
+bool MySimulation::ioCheck(const std::string* ioList, const int listSize)
+{
+    for (int i = 0; i < listSize; i++) {
+        if (getModulePosition(ioList[i]) <= moduleNumber) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool MySimulation::checkGain()
+{
+    bool ret = true;
+    for (auto it : gainModule) {
+        if (sizeof(it.second.info.input) == 0) {
+            std::cout << it.first << "\033[31m: the input not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (it.second.info.output.empty()) {
+            std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (!ioCheck(it.second.info.input, size(it.second.info.input))) {
+            ret = false;
+            std::cout << it.first << "\033[31m: the input error!!!\033[0m" << std::endl;
+        }
+
+        for (auto out : it.second.info.output) {
+            if (getModulePosition(out.first) > moduleNumber) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the out error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+bool MySimulation::checkSum()
+{
+    bool ret = true;
+    for (auto it : sumModule) {
+        if (sizeof(it.second.input) == 0) {
+            std::cout << it.first << "\033[31m: the input not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (it.second.output.empty()) {
+            std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (!ioCheck(it.second.input, size(it.second.input))) {
+            ret = false;
+            std::cout << it.first << "\033[31m: the input error!!!\033[0m" << std::endl;
+        }
+
+        for (auto out : it.second.output) {
+            if (getModulePosition(out.first) > moduleNumber) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the out error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+bool MySimulation::checkMult()
+{
+    bool ret = true;
+    for (auto it : multModule) {
+        if (sizeof(it.second.input) == 0) {
+            std::cout << it.first << "\033[31m: the input not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (it.second.output.empty()) {
+            std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (!ioCheck(it.second.input, size(it.second.input))) {
+            ret = false;
+            std::cout << it.first << "\033[31m: the input error!!!\033[0m" << std::endl;
+        }
+
+        for (auto out : it.second.output) {
+            if (getModulePosition(out.first) > moduleNumber) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the out error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+bool MySimulation::checkSine()
+{
+    bool ret = true;
+    for (auto it : sineModule) {
+        if (it.second.output.empty()) {
+            std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        for (auto out : it.second.output) {
+            if (getModulePosition(out.first) > moduleNumber) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the out error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+bool MySimulation::checkDisp()
+{
+    bool ret = true;
+    for (auto it : dispModule) {
+        if (it.second.input.empty()) {
+            std::cout << it.first << "\033[31m: the input not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        for (auto out : it.second.input) {
+            if (getModulePosition(out.first) > moduleNumber) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the input error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+
+bool MySimulation::moduleValidityCheck()
+{
+    return  checkGain() && checkSum() && checkMult() && checkDisp() && checkSine();
 }
 
 void MySimulation::showData()

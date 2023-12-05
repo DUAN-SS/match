@@ -65,6 +65,14 @@ private:
     void parseSineModule(const rapidjson::Document& doc);
     void parseDspModule(const rapidjson::Document& doc);
 
+
+
+    bool checkGain();
+    bool checkSum();
+    bool checkMult();
+    bool checkDisp();
+    bool checkSine();
+
     /** 
      * @brief     : parse the step size and final time.
      * @author    : yongping.duan@keliangtek
@@ -161,6 +169,8 @@ private:
      */
     void dfs(int i);
 
+    bool moduleValidityCheck();
+    bool ioCheck(const std::string* ioList, const int listSize);
 public:
     MySimulation();
     ~MySimulation();
