@@ -3,34 +3,35 @@
     {
       "name": "gain1",
       "value": 2.0,
-      "input": [ "sum1" ],
-      "output": [ "sum2" ]
+      "input": [ "cons1" ],
+      "output": [ "sum1" ]
     }
   ],
   "sum": [
     {
       "name": "sum1",
-      "input": [ "sum2", "cons1" ],
-      "output": [ "sum2", "gain1" ]
-
-    },
-    {
-      "name": "sum2",
-      "input": ["sum1", "gain1"],
-      "output": ["disp1", "sum1"]
+      "input": [ "sine1", "gain1" ],
+      "output": [ "disp1" ]
     }
   ],
   "cons": [
     {
       "name": "cons1",
-      "value": 0.5,
-      "output": [ "sum1" ]
+      "value": 2.0,
+      "output": [ "gain1" ]
     }
   ],
   "disp": [
     {
       "name": "disp1",
-      "input": [ "sum2" ]
+      "input": [ "sum1" ]
+    }
+  ],
+  "sine": [
+    {
+      "name": "sine1",
+      "value": 2.0,
+      "output": [ "sum1" ]
     }
   ],
   "step": [

@@ -1,5 +1,6 @@
 ﻿#include "simulation.h"
 #include <cmath>
+#include <iomanip>
 
 const std::string g_model_data_json_file = "../modelconfig.json";
 
@@ -436,10 +437,10 @@ void MySimulation::startSimulation()
     startDfs();
     long long stepCount = 0;
     long long stepNum = m_step.final_time / m_step.step_size;
-    while (stepCount - stepNum) {
+    while (stepCount - stepNum <= 0) {
         for (auto it : m_dispModule) {
             for (auto input : it.second.input) {
-                m_outFile << calculateSimulationResult(input.first, stepCount * m_step.step_size, false) << std::endl;
+                m_outFile << std::fixed << std::setprecision(19) <<calculateSimulationResult(input.first, stepCount * m_step.step_size, false) << std::endl;
             }
         }
         stepCount++;
