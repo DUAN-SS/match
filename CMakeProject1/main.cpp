@@ -3,8 +3,7 @@
 
 int main()
 {
-    MySimulation simuJson;
-    simuJson.startSimulation();
-    simuJson.showData();
+    MySimulation::getInstance().startSimulation();
+    MySimulation::getInstance().showData();
     return 0;
 }

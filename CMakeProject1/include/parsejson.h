@@ -40,6 +40,12 @@ private:
     std::string relationship[MAXNUM][2]; // the input/output relationship of the modules.
     std::ofstream outFile;               // the file that store the simulation result.
 
+
+    MySimulation();  // external construction prohibited.
+    ~MySimulation(); // prohibit external destruction.
+    MySimulation(const MySimulation& mySimulation) = delete;                     // prohibit external copy constructs.
+    const MySimulation& operator=(const MySimulation& mySimulation) = delete;    // disable external assignment operations.
+
     /** 
      * @brief     : parse the module infomation.
      * @author    : yongping.duan@keliangtek.
@@ -66,12 +72,30 @@ private:
     void parseDspModule(const rapidjson::Document& doc);
 
 
-
+    /** 
+     * @brief     : check the validity of the model.
+     * @author    : yongping.duan@keliangtek
+     * @param[in] : the module infomation.
+     * @param[out]: none
+     * @return    : return true if valid, otherwise, return false.
+     * @note      : none
+     */
+    bool moduleValidityCheck();
     bool checkGain();
     bool checkSum();
     bool checkMult();
     bool checkDisp();
     bool checkSine();
+    /** 
+     * @brief     : check the input/output validity of the model.
+     * @author    : yongping.duan@keliangtek
+     * @param[in] : const std::string* ioList: io list.
+     *              const int listSize: the io list size.
+     * @param[out]: none
+     * @return    : return true if valid, otherwise, return false.
+     * @note      : none
+     */
+    bool ioCheck(const std::string* ioList, const int listSize);
 
     /** 
      * @brief     : parse the step size and final time.
@@ -169,13 +193,11 @@ private:
      */
     void dfs(int i);
 
-    bool moduleValidityCheck();
-    bool ioCheck(const std::string* ioList, const int listSize);
 public:
-    MySimulation();
-    ~MySimulation();
-
-
+    static MySimulation& getInstance() {
+        static MySimulation mySimulation;
+        return mySimulation;
+    }
     /* debug ,show the data*/
     void showData();
 
@@ -188,7 +210,6 @@ public:
      * @note      : none.
      */
     void startSimulation();
-
 
 }; // class Simulation
 

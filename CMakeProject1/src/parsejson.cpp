@@ -248,16 +248,13 @@ void MySimulation::parseStepSize(const rapidjson::Document& doc)
 {
     if (doc.HasMember("step") && doc["step"].IsArray()) {
         auto step_config_arrays = doc["step"].GetArray();
-        std::cout << "Size: " << step_config_arrays.Size() << std::endl;
         for (unsigned int i = 0; i < step_config_arrays.Size(); i++) {
             if (step_config_arrays[i].HasMember("finaltime") && step_config_arrays[i]["finaltime"].IsInt()) {
                 step.finalTime = step_config_arrays[i]["finaltime"].GetInt();
-                std::cout << "finalTime: " << step.finalTime << std::endl;
             }
 
             if (step_config_arrays[i].HasMember("stepsize") && step_config_arrays[i]["stepsize"].IsDouble()) {
                 step.stepSize = step_config_arrays[i]["stepsize"].GetDouble();
-                std::cout << "stepSize: " << step.stepSize << std::endl;
             }
         }
     }
@@ -300,6 +297,7 @@ int MySimulation::getModulePosition(std::string moduleName)
             return i;
         }
     }
+    return MAXNUM;
 }
 
 void MySimulation::creatAdjacentMatrix()
@@ -307,7 +305,9 @@ void MySimulation::creatAdjacentMatrix()
     for (int i = 0; i < relationshipNum; i++) {
         int from = getModulePosition(relationship[i][0]);
         int to = getModulePosition(relationship[i][1]);
-        adjacentMatrix[from][to] = 1;
+        if ((from != MAXNUM) && (to != MAXNUM)) {
+            adjacentMatrix[from][to] = 1;
+        }
     }
 }
 
@@ -315,7 +315,6 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
 {
     if (lastModel.find("cons") != std::string::npos) {
         consModule[lastModel].outputValue = consModule[lastModel].consValue;
-        std::cout << lastModel << ":" << consModule[lastModel].outputValue << std::endl;
         return consModule[lastModel].outputValue;
     }
 
@@ -349,7 +348,6 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
             sumModule[lastModel].outputValue = calculateSimulationResult(sumModule[lastModel].input[0], sinValue, false) +
                 calculateSimulationResult(sumModule[lastModel].input[1], sinValue, true);
         }
-        std::cout << lastModel << ":" << sumModule[lastModel].outputValue << std::endl;
         return sumModule[lastModel].outputValue;
     }
 
@@ -358,7 +356,6 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
             return gainModule[lastModel].outputValue;
         }
         gainModule[lastModel].outputValue = gainModule[lastModel].gainValue * calculateSimulationResult(gainModule[lastModel].info.input[0], sinValue, false);
-        std::cout << lastModel << ":" << gainModule[lastModel].outputValue << std::endl;
         return gainModule[lastModel].outputValue;
     }
 
@@ -367,13 +364,11 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
         //const double pi = atan(1.0) * 4;
         //sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue * pi / 180);
         sineModule[lastModel].outputValue = sineModule[lastModel].sineValue * sin(sinValue);
-        std::cout << lastModel<< " : " << sinValue << " : " << sineModule[lastModel].outputValue << std::endl;
         return sineModule[lastModel].outputValue;
     }
 
     if (lastModel.find("mult") != std::string::npos) {
         if (getPreValue) {
-            std::cout << lastModel << ":" << multModule[lastModel].outputValue << std::endl;
             return multModule[lastModel].outputValue;
         }
 
@@ -401,7 +396,6 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
             multModule[lastModel].outputValue = calculateSimulationResult(multModule[lastModel].input[0], sinValue, false) *
                 calculateSimulationResult(multModule[lastModel].input[1], sinValue, true);
         }
-        std::cout << lastModel << ":" << multModule[lastModel].outputValue << std::endl;
         return multModule[lastModel].outputValue;
     }
 }
@@ -414,14 +408,8 @@ void MySimulation::startSimulation()
 
     DFS();
     long long stepCount = 0;
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    std::cout << "当前时间: " << asctime(timeinfo) << "  finalTime: " << step.finalTime << "  stepSize: " << step.stepSize << std::endl;
     long long stepNum = step.finalTime / step.stepSize;
     while(stepCount <= stepNum) {
-        std::cout << "第" << stepCount << "步" << std::endl;
         for (auto it : dispModule) {
             for (auto input : it.second.input) {
                 outFile << calculateSimulationResult(input.first, stepCount * step.stepSize, false) << std::endl;
@@ -429,18 +417,22 @@ void MySimulation::startSimulation()
         }
         stepCount++;
     }
-
 }
 
 
 bool MySimulation::ioCheck(const std::string* ioList, const int listSize)
 {
+    int ret = true;
+    if (ioList == nullptr) {
+        return ret;
+    }
+
     for (int i = 0; i < listSize; i++) {
-        if (getModulePosition(ioList[i]) <= moduleNumber) {
-            return true;
+        if (getModulePosition(ioList[i]) > moduleNumber) {
+            ret = false;
         }
     }
-    return false;
+    return ret;
 }
 
 
@@ -458,7 +450,7 @@ bool MySimulation::checkGain()
             ret = false;
         }
 
-        if (!ioCheck(it.second.info.input, size(it.second.info.input))) {
+        if (!ioCheck(it.second.info.input, 1)) {
             ret = false;
             std::cout << it.first << "\033[31m: the input error!!!\033[0m" << std::endl;
         }
@@ -575,93 +567,74 @@ bool MySimulation::moduleValidityCheck()
     return  checkGain() && checkSum() && checkMult() && checkDisp() && checkSine();
 }
 
+
 void MySimulation::showData()
 {
+    std::cout << "***************         step: " << step.stepSize << "     *************" << std::endl;
+    std::cout << "***************         step: " << step.finalTime << "     *************" << std::endl;
+
+    std::cout << "\033[36m***********************module list***********************\033[0m" << std::endl;
+    int maxLen = 0;
+    for (int i = 0; i <= moduleNumber; i++) {
+        if (moduleList[i].length() > maxLen) {
+            maxLen = moduleList[i].length();
+        }
+        std::cout << "\033[36m*****                \033[0m" <<  moduleList[i] << std::endl;
+    }
+    std::cout << "\033[36m***********************module list***********************\033[0m" << std::endl << std::endl;
+
+
+    std::cout << "\033[34m***********************module relationship***********************\033[0m" << std::endl;
+    for (int i = 0; i < relationshipNum; i++) {
+        std::cout <<"\033[34m*****                \033[0m" << relationship[i][0] << ", "<< relationship[i][1] << std::endl;
+    }
+    std::cout << "\033[34m***********************module relationship***********************\033[0m" << std::endl << std::endl;
+
+
+    std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl;
     for (auto it : gainModule) {
-        std::cout << "gain name: " << it.first << std::endl;
-        for (int i = 0; i < size(it.second.info.input); i++) {
-            std::cout << "    input: " << it.second.info.input[i] << std::endl;
-        }
-
-        for (auto output : it.second.info.output) {
-            std::cout << "    output: " << output.first << " " << output.second << std::endl;
-        }
+        std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.gainValue << std::endl;
     }
-
-    for (auto it : sumModule) {
-        std::cout << "sum name: " << it.first << std::endl;
-        for (int i = 0; i < size(it.second.input); i++) {
-            std::cout << "    input: " << it.second.input[i] << std::endl;
-        }
-        for (auto output : it.second.output) {
-            std::cout << "    output: " << output.first << " " << output.second << std::endl;
-        }
-    }
-
-
-    for (auto it : multModule) {
-        std::cout << "mult name: " << it.first << std::endl;
-        for (int i = 0; i < size(it.second.input); i++) {
-            std::cout << "    input: " << it.second.input[i] << std::endl;
-        }
-        for (auto output : it.second.output) {
-            std::cout << "    output: " << output.first << " " << output.second << std::endl;
-        }
-    }
-
-
-    for (auto it : sineModule) {
-        std::cout << "sine name: " << it.first << std::endl;
-        for (auto output : it.second.output) {
-            std::cout << "    output: " << output.first << " " << output.second << std::endl;
-        }
-        std::cout << "    sineValue: " << it.second.sineValue << std::endl;
-    }
-
 
     for (auto it : consModule) {
-        std::cout << "cons name: " << it.first << std::endl;
-        for (auto output : it.second.output) {
-            std::cout << "    output: " << output.first << " " << output.second << std::endl;
-        }
-        std::cout << "    consValue: " << it.second.consValue << std::endl;
+        std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.consValue << std::endl;
     }
 
-
-    for (auto it : dispModule) {
-        std::cout << "disp name: " << it.first << std::endl;
-        for (auto input : it.second.input) {
-            std::cout << "    input: " << input.first << " " << input.second << std::endl;
-        }
+    for (auto it : sineModule) {
+        std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.sineValue << std::endl;
     }
-    std::cout << "step: " << step.stepCout << std::endl;
+    std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl << std::endl;
 
-    std::cout << "*********************\n\n" << std::endl;
-    for (int i = 0; i <= moduleNumber; i++) {
-        std::cout << moduleList[i] << std::endl;
-    }
-    std::cout << "*********************\n\n" << std::endl;
-    for (int i = 0; i < relationshipNum; i++) {
-        std::cout << relationship[i][0] << ", "<< relationship[i][1] << std::endl;
+    std::cout << "\033[32m***********************adjacentMatrix***********************\033[0m" << std::endl;
+    std::cout << "\033[32m*****       \033[0m";
+    for (int i = 0; i < maxLen + 2; i++) {
+        std::cout << " ";
     }
 
-    std::cout << "***********moduleList**********\n\n     adjacentMatrix:" << std::endl;
     for (int k = 0; k <= moduleNumber; k++) {
+        if (moduleList[k].length() > maxLen) {
+            maxLen = moduleList[k].length();
+        }
         std::cout << moduleList[k] << "  ";
     }
-    std::cout << std::endl;;
+    std::cout <<"\033[32m   *****\033[0m" << std::endl;;
+
     for (int i = 0; i <= moduleNumber; i++) {
-        std::cout << moduleList[i] << ": ";
-        for (int j = 0; j <= moduleNumber; j++) {
-            std::cout << adjacentMatrix[i][j] << "  ";
+        std::cout<< "\033[32m*****       \033[0m" << moduleList[i];
+        for (int x = 0; x < (9 - moduleList[i].length()); x++) {
+            std::cout << " ";
         }
-        std::cout << "          " << std::endl;
-    }
+        for (int j = 0; j <= moduleNumber; j++) {
+            std::cout << adjacentMatrix[i][j];
+            for (int k = 0; k < 5; k++) {
+                std::cout << " ";
+            }
+        }
 
-    std::cout << "***********cycle**********\n\n" << std::endl;
+        std::cout << "\033[32m    *****\033[0m" << std::endl;
+    }
+    std::cout << "\033[32m***********************adjacentMatrix***********************\033[0m" << std::endl << std::endl;
     for (int i = 0; i < cycleNum; i++) {
-        std::cout << "环在" << "from: [" << moduleList[cycle[i][0]] << "]  to: [" << moduleList[cycle[i][1]] << "]" << std::endl;
+        std::cout << "\033[33m环在" << "from: [" << moduleList[cycle[i][0]] << "]  to: [" << moduleList[cycle[i][1]] << "]\033[0m" << std::endl;
     }
-
-    
 }

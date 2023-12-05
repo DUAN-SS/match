@@ -50,7 +50,6 @@ typedef struct Timing
 {
     int finalTime;   // the final time
     double stepSize; // the step size
-    int stepCout;    // simulate count
 }Timing;
 
 #pragma pack()
