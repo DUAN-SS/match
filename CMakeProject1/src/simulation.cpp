@@ -1,6 +1,5 @@
-﻿#include "parsejson.h"
+﻿#include "simulation.h"
 #include <cmath>
-#include <ctime>
 
 const std::string MODEL_DATA_JSON_FILE_PATH = "../modelconfig.json";
 

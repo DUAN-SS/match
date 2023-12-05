@@ -1,13 +1,23 @@
-﻿#ifndef _PARSEJSON_H_
-#define _PARSEJSON_H_
+﻿/**@file  : parsejson.h
+ *@brief  : descripe the module infomation
+ *@author :
+ *@date   : 2023.12.04
+ *@version: V0.1
+ *@note   : note
+ *@detailed description:
+ */
 
-#include <fstream>
+#ifndef _SIMULATION_H_
+#define _SIMULATION_H_
+
 #include <iostream>
 #include <map>
 #include <string>
+#include <fstream>
 
 #include "document.h"
 #include "istreamwrapper.h"
+
 #include "modeldata.h"
 
 class MySimulation
@@ -214,4 +224,4 @@ public:
 
 }; // class Simulation
 
-#endif //__PARSECONFIG_H__
+#endif // _SIMULATION_H_
