@@ -1,9 +1,7 @@
-﻿#include <iostream>
-#include "parsejson.h"
+﻿#include "parsejson.h"
 
-int main()
-{
-    MySimulation::getInstance().startSimulation();
-    MySimulation::getInstance().showData();
-    return 0;
+int main() {
+  MySimulation::getInstance().startSimulation();
+  MySimulation::getInstance().showData();
+  return 0;
 }

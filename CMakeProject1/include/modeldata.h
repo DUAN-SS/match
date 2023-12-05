@@ -12,33 +12,33 @@
 #include <iostream>
 #include <map>
 
-const int MAXNUM = 100;
+const int g_MaxNumber = 100;
 
 #pragma pack(1)
 typedef struct ModuleInfo {
     std::string input[2];
     std::map<std::string, double> output;
-    double outputValue = 0.0;
+    double output_value = 0.0;
 }ModuleInfo;
 
 typedef struct Gain {
     ModuleInfo info;
-    double outputValue;
-    double gainValue;
+    double output_value = 0.0;
+    double gain_value = 0.0;
 }Gain;
 
 typedef struct Sine
 {
     std::map<std::string, double> output;
-    double sineValue;
-    double outputValue;
+    double sine_value = 0.0;
+    double output_value = 0.0;
 }Sine;
 
 typedef struct Cons
 {
     std::map<std::string, double> output;
-    double consValue;
-    double outputValue;
+    double cons_value = 0.0;
+    double output_value = 0.0;
 }Cons;
 
 typedef struct Disp
@@ -48,8 +48,8 @@ typedef struct Disp
 
 typedef struct Timing 
 {
-    int finalTime;   // the final time
-    double stepSize; // the step size
+    int final_time = -1;   // the final time
+    double step_size = 0.0; // the step size
 }Timing;
 
 #pragma pack()
