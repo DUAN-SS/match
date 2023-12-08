@@ -40,9 +40,9 @@ private:
     int m_adjacentMatrix[g_MaxNumber][g_MaxNumber]; // Zero-order matrix, indicates the
                                                     // relationship between modules, set the
                                                     // value is 1 if two modules are related.
-                                                    // eg: the output of module1 is the input
-                                                    // of module2. |       | module1  | module2
-                                                    // | |module1|   0      |    1     |
+                                                    // eg: the output of module1 is the input of module2.
+                                                    // |       | module1  | module2  |
+                                                    // |module1|   0      |    1     |
                                                     // |module2|   0      |    0     |
 
     int m_moduleNumber;                         // the module numbers.

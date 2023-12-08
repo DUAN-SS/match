@@ -1,0 +1,43 @@
+{
+  "gain": [
+    {
+      "name": "gain1",
+      "value": 2.0,
+      "input": ["mult1"],
+      "output": ["sum1"]
+    }
+  ],
+  "mult": [
+    {
+      "name": "mult1",
+      "input": [ "sine1", "sum1" ],
+      "output": [ "gain1", "sum1" ]
+    }
+  ],
+  "sum": [
+    {
+      "name": "sum1",
+      "input": ["gain1", "mult1"],
+      "output": ["disp1", "mult1"]
+    }
+  ],
+  "disp": [
+    {
+      "name": "disp1",
+      "input": ["sum1"]
+    }
+  ],
+  "sine": [
+    {
+      "name": "sine1",
+      "value": 2.0,
+      "output": ["mult1"]
+    }
+  ],
+  "step": [
+    {
+      "finaltime": 10,
+      "stepsize": 0.01
+    }
+  ]
+}
