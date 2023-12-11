@@ -1,0 +1,21 @@
+{
+  "disp": [
+    {
+      "name": "disp1",
+      "input": [ "sine1" ]
+    }
+  ],
+  "sine": [
+    {
+      "name": "sine1",
+      "value": 2.0,
+      "output": [ "disp1" ]
+    }
+  ],
+  "step": [
+    {
+      "finaltime": 10,
+      "stepsize": 0.0001
+    }
+  ]
+}

@@ -30,7 +30,7 @@
   "sine": [
     {
       "name": "sine1",
-      "value": 3.0,
+      "value": 2.0,
       "output": [ "null" ]
     }
   ],

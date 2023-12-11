@@ -36,7 +36,7 @@
   ],
   "step": [
     {
-      "finaltime": 10,
+      "finaltime": 10.0,
       "stepsize": 0.01
     }
   ]

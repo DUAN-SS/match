@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iomanip>
 
-const std::string g_model_data_json_file = "../modelconfig.json";
+const std::string g_model_data_json_file = "../example6.json";
 
 MySimulation::MySimulation()
 {
@@ -221,7 +221,7 @@ void MySimulation::parseSineModule(const rapidjson::Document& doc)
             }
 
             if (sine_config_arrays[i].HasMember("value") && sine_config_arrays[i]["value"].IsDouble()) {
-                sineInfo.sine_value = sine_config_arrays[i]["value"].GetDouble();
+                sineInfo.amplitude = sine_config_arrays[i]["value"].GetDouble();
             }
 
             if (sine_config_arrays[i].HasMember("output") && sine_config_arrays[i]["output"].IsArray()) {
@@ -265,8 +265,8 @@ void MySimulation::parseStepSize(const rapidjson::Document& doc)
     if (doc.HasMember("step") && doc["step"].IsArray()) {
         auto step_config_arrays = doc["step"].GetArray();
         for (unsigned int i = 0; i < step_config_arrays.Size(); i++) {
-            if (step_config_arrays[i].HasMember("finaltime") && step_config_arrays[i]["finaltime"].IsInt()) {
-                m_step.final_time = step_config_arrays[i]["finaltime"].GetInt();
+            if (step_config_arrays[i].HasMember("finaltime") && step_config_arrays[i]["finaltime"].IsDouble()) {
+                m_step.final_time = step_config_arrays[i]["finaltime"].GetDouble();
             }
 
             if (step_config_arrays[i].HasMember("stepsize") && step_config_arrays[i]["stepsize"].IsDouble()) {
@@ -333,11 +333,15 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
 {
     if (lastModel.find("cons") != std::string::npos) { // the cons is not be cycle. return the value.
         m_consModule[lastModel].output_value = m_consModule[lastModel].cons_value;
+        //std::cout << lastModel << ": " << m_consModule[lastModel].output_value << std::endl;
+       
         return m_consModule[lastModel].output_value;
     }
 
     if (lastModel.find("sum") != std::string::npos) {
         if (getPreValue) { // if it is the star of cycle.
+            //std::cout << lastModel << ": pre: " << m_sumModule[lastModel].output_value << std::endl;
+           
             return m_sumModule[lastModel].output_value;
         }
         int j = 0;
@@ -355,7 +359,7 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
                 break;
             }
         }
-
+        
         if (j == 2) { // the sum is not the cycle.
             m_sumModule[lastModel].output_value =
                     calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false)
@@ -369,11 +373,15 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
                     calculateSimulationResult(m_sumModule[lastModel].input[0], sinValue, false)
                     + calculateSimulationResult(m_sumModule[lastModel].input[1], sinValue, true);
         }
+        //std::cout << lastModel << ": " << m_sumModule[lastModel].output_value << std::endl;
+
         return m_sumModule[lastModel].output_value;
     }
 
     if (lastModel.find("gain") != std::string::npos) {
         if (getPreValue) { // if the gain is the start of cycle.
+            std::cout << lastModel << ": pre: " << m_gainModule[lastModel].output_value << std::endl;
+
             return m_gainModule[lastModel].output_value;
         }
         // the gain output = the input * gain value;
@@ -387,7 +395,8 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
         // const double pi = atan(1.0) * 4;
         // sineModel[lastModel].outputValue = sineModel[lastModel].sineValue * sin(sinValue * pi / 180);
         // the sine value is the count of step * simulation step.
-        m_sineModule[lastModel].output_value = m_sineModule[lastModel].sine_value * sin(sinValue);
+        m_sineModule[lastModel].output_value = m_sineModule[lastModel].amplitude * sin(sinValue);
+        std::cout << lastModel << ": " << m_sineModule[lastModel].output_value << std::endl;
         return m_sineModule[lastModel].output_value;
     }
 
@@ -411,6 +420,7 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
                 break;
             }
         }
+
         if (j == 2) {
             m_multModule[lastModel].output_value =
                     calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false)
@@ -424,6 +434,7 @@ double MySimulation::calculateSimulationResult(std::string lastModel, double sin
                     calculateSimulationResult(m_multModule[lastModel].input[0], sinValue, false)
                     * calculateSimulationResult(m_multModule[lastModel].input[1], sinValue, true);
         }
+        //std::cout << lastModel << ": " << m_multModule[lastModel].output_value << std::endl;
         return m_multModule[lastModel].output_value;
     }
 }
@@ -604,8 +615,8 @@ bool MySimulation::moduleValidityCheck()
 
 void MySimulation::showData()
 {
-    std::cout << "***************         step: " << m_step.step_size << "     *************" << std::endl;
-    std::cout << "***************         step: " << m_step.final_time << "     *************" << std::endl;
+    std::cout << "***************         step_size: " << m_step.step_size << "     *************" << std::endl;
+    std::cout << "***************         final_time: " << m_step.final_time << "     *************" << std::endl;
 
     std::cout << "\033[36m***********************module list***********************\033[0m" << std::endl;
     int maxLen = 0;
@@ -635,7 +646,7 @@ void MySimulation::showData()
     }
 
     for (auto it : m_sineModule) {
-        std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.sine_value << std::endl;
+        std::cout << "\033[35m*****                \033[0m" << it.first << ": " << it.second.amplitude << std::endl;
     }
     std::cout << "\033[35m***********************module parameter***********************\033[0m" << std::endl
               << std::endl;

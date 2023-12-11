@@ -30,7 +30,7 @@ typedef struct Gain {
 typedef struct Sine
 {
     std::map<std::string, double> output;
-    double sine_value = 0.0;
+    double amplitude = 0.0;
     double output_value = 0.0;
 }Sine;
 
@@ -48,7 +48,7 @@ typedef struct Disp
 
 typedef struct Timing 
 {
-    int final_time = -1;   // the final time
+    double final_time = -1.0;   // the final time
     double step_size = 0.0; // the step size
 }Timing;
 

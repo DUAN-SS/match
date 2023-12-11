@@ -3,14 +3,14 @@
     {
       "name": "gain1",
       "value": 2.0,
-      "input": [ "sum1" ],
-      "output": [ "mult1" ]
+      "input": [ "sum2" ],
+      "output": [ "sum3" ]
     }
   ],
   "mult": [
     {
       "name": "mult1",
-      "input": [ "gain1", "sum1" ],
+      "input": [ "sum3", "sum1" ],
       "output": [ "disp1", "sum1" ]
     }
   ],
@@ -18,7 +18,17 @@
     {
       "name": "sum1",
       "input": [ "sine1", "mult1" ],
-      "output": [ "gain1", "mult1" ]
+      "output": [ "sum2", "mult1" ]
+    },
+    {
+      "name": "sum2",
+      "input": [ "sum1", "sum3" ],
+      "output": [ "gain1" ]
+    },
+    {
+      "name": "sum3",
+      "input": [ "gain1", "sum2" ],
+      "output": [ "sum2","mult1" ]
     }
   ],
   "disp": [
