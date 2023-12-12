@@ -4,21 +4,24 @@
       "name": "gain1",
       "value": 2.0,
       "input": [ "mult1" ],
-      "output": [ "sum1" ]
+      "output": [ "sum1" ],
+      "initvalue":0.0
     }
   ],
   "mult": [
     {
       "name": "mult1",
       "input": [ "sine1", "sum1" ],
-      "output": [ "gain1", "sum1" ]
+      "output": [ "gain1", "sum1" ],
+      "initvalue": 1.0
     }
   ],
   "sum": [
     {
       "name": "sum1",
       "input": [ "mult1", "gain1" ],
-      "output": [ "disp1", "mult1" ]
+      "output": [ "disp1", "mult1" ],
+      "initvalue": 2.0
     }
   ],
   "disp": [
