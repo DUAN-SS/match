@@ -62,8 +62,8 @@ public:
     static std::map<std::string, Cons> m_consModule;       // the cons module infomation.
     static std::map<std::string, Disp> m_dispModule;       // the disp module infomation.
     static std::vector<std::string> m_moduleList;          // the modules array.
-    static std::vector<std::vector<std::string>>
-            m_relationship; // the input/output MyClass::relationship of the modules.
+    // the input/output MyClass::relationship of the modules.
+    static std::vector<std::vector<std::string>> m_relationship; 
 };
 
 #endif // _MODEL_DATA_H_
