@@ -302,6 +302,7 @@ bool ParseCfg::ioCheck(const std::string* ioList, const int& listSize)
 
 bool ParseCfg::checkGain()
 {
+    const double eps = 1e-6;
     bool ret = true;
     for (auto it : ModuleData::m_gainModule) {
         if (sizeof(it.second.info.input) == 0) {
@@ -311,6 +312,11 @@ bool ParseCfg::checkGain()
 
         if (it.second.info.output.empty()) {
             std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (fabs(it.second.gain_value - 0.0) < eps) {
+            std::cout << it.first << "\033[31m: the value is invalid!!!\033[0m" << std::endl;
             ret = false;
         }
 
@@ -390,9 +396,42 @@ bool ParseCfg::checkMult()
 bool ParseCfg::checkSine()
 {
     bool ret = true;
+    const double eps = 1e-6;
+
     for (auto it : ModuleData::m_sineModule) {
         if (it.second.output.empty()) {
             std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+        
+        if (fabs(it.second.amplitude - 0.0) < eps)
+        {
+            std::cout << it.first << "\033[31m: the value is invalid!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        for (auto out : it.second.output) {
+            if (getModulePosition(out.first) == -1) {
+                ret = false;
+                std::cout << it.first << "\033[31m: the out error!!!\033[0m" << std::endl;
+            }
+        }
+    }
+    return ret;
+}
+
+bool ParseCfg::checkCons()
+{
+    bool ret = true;
+    const double eps = 1e-6;
+    for (auto it : ModuleData::m_consModule) {
+        if (it.second.output.empty()) {
+            std::cout << it.first << "\033[31m: the output not connect!!!\033[0m" << std::endl;
+            ret = false;
+        }
+
+        if (fabs(it.second.cons_value - 0.0) < eps) {
+            std::cout << it.first << "\033[31m: the value is invalid!!!\033[0m" << std::endl;
             ret = false;
         }
 
@@ -437,5 +476,5 @@ bool ParseCfg::checkStep()
 
 bool ParseCfg::moduleValidityCheck()
 {
-    return checkGain() && checkSum() && checkMult() && checkDisp() && checkSine() && checkStep();
+    return checkGain() && checkSum() && checkMult() && checkDisp() && checkSine() && checkStep() && checkCons();
 }

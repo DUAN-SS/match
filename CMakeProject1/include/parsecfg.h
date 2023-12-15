@@ -24,7 +24,7 @@ private:
 
     /** 
      * @brief     : parse the gain module infomation.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    :
      * @param[in] : const rapidjson::Document& doc
      * @param[out]:
      *            : static Timing m_step.
@@ -48,7 +48,7 @@ private:
 
     /** 
      * @brief     : check the validity of the model.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    : 
      * @param[in] : the module infomation.
      * @param[out]: none
      * @return    : return true if valid, otherwise, return false.
@@ -61,10 +61,11 @@ private:
     bool checkDisp();
     bool checkSine();
     bool checkStep();
+    bool checkCons();
 
     /** 
      * @brief     : check the input/output validity of the model.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    : 
      * @param[in] : const std::string* ioList: io list.
      *              const int listSize: the io list size.
      * @param[out]: none
