@@ -25,6 +25,10 @@
     {
       "name": "disp1",
       "input": [ "sum1" ]
+    },
+    {
+      "name": "disp2",
+      "input": [ "gain1" ]
     }
   ],
   "sine": [

@@ -166,15 +166,28 @@ void Simulation::startSimulation()
     long long stepCount = 0;
     // calculate the number of steps to be simulated,
     long long stepNum = ModuleData::m_step.final_time / ModuleData::m_step.step_size;
+    m_outFile << "stepsize      ";
+    for (auto it : ModuleData::m_dispModule) {
+        m_outFile << it.first << "                               ";
+    }
+    m_outFile << std::endl;
     while (stepCount - stepNum <= 0) {
+        m_outFile << stepCount << "           ";
         for (auto it : ModuleData::m_dispModule) {
             for (auto input : it.second.input) {
+                double result= calculateSimulationResult(input.first, stepCount * ModuleData::m_step.step_size, false);
                 // keep 19 decimal places.
-                m_outFile << std::fixed << std::setprecision(19)
-                          << calculateSimulationResult(input.first, stepCount * ModuleData::m_step.step_size, false)
-                          << std::endl;
+                m_outFile << std::fixed << std::setprecision(19) << result << "      ";
+                std::cout << "********************************" << std::endl;
+                std::cout << "*********    " << it.first << "    **********" << std::endl;
+                std::cout << "********************************" << std::endl;
+                std::cout << "**** " << std::fixed << std::setprecision(19) 
+                          << result << " *****" << std::endl;
+                std::cout << "********************************\n\n" << std::endl;
             }
+            
         }
+        m_outFile << std::endl;
         stepCount++;
     }
 }
