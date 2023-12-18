@@ -3,7 +3,7 @@
 #include <fstream>
 
 
-const std::string g_model_data_json_file = "../example1.json";
+const std::string g_model_data_json_file = "../example88888.json";
 
 ParseCfg::ParseCfg() { }
 

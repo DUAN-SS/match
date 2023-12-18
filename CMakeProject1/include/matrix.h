@@ -1,6 +1,6 @@
 ﻿/**@file  : matrix.h
  *@brief  : Create a zero-order matrix
- *@author : yongping.duan@keliangtek.com
+ *@author :  
  *@date   : 2023.12.04
  *@version: V0.1
  *@note   : note
@@ -24,7 +24,7 @@ public:
 
     /** 
      * @brief     : create the adjacent matrix.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    :  
      * @param[in] : std::string MyClass::relationship[MAXNUM][2].
      *              int relationshipNum.
      * @param[out]: int adjacentMatrix[MAXNUM][MAXNUM].
@@ -47,7 +47,7 @@ private:
 
     /** 
      * @brief     : get the module location in the moduleList.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    :  
      * @param[in] : std::string moduleName: the name of module.
      *              int relationshipNum.
      * @param[out]: none

@@ -176,7 +176,7 @@ void Simulation::startSimulation()
         for (auto it : ModuleData::m_dispModule) {
             for (auto input : it.second.input) {
                 double result= calculateSimulationResult(input.first, stepCount * ModuleData::m_step.step_size, false);
-                // keep 19 decimal places.
+                // keep 19 decimal places. add the result to file.
                 m_outFile << std::fixed << std::setprecision(19) << result << "      ";
                 std::cout << "********************************" << std::endl;
                 std::cout << "*********    " << it.first << "    **********" << std::endl;

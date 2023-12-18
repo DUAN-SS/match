@@ -1,6 +1,6 @@
 ﻿/**@file  : simulation.h
  *@brief  : The model is simulated
- *@author : yongping.duan@keliangtek.com
+ *@author :  
  *@date   : 2023.12.04
  *@version: V0.1
  *@note   : note
@@ -25,7 +25,7 @@ public:
     }
     /** 
      * @brief     : the entry function, start the simulation.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : the input of module.
      * @param[out]: the output of module.
      * @return    : none.
@@ -49,7 +49,7 @@ private:
     /** 
      * @brief     : calculate the result of simulation. starting from the output,
      *              a recursive algorithm is used to iterate forward  
-     * @author    : yongping.duan@keliangtek  
+     * @author    : 
      * @param[in] : std::string lastModel: the input module.
      *              double sinValue: the sine value.
      *              bool getPreValue: whether to get the value of the previous step.
@@ -63,7 +63,7 @@ private:
 
     /** 
      * @brief     : depth-first algorithm.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : static std::vector<std::string> m_moduleList.
      * @param[out]: std::vector<std::vector<int>> m_cycle.
      *              std::vector<int> m_color.
@@ -74,7 +74,7 @@ private:
 
     /** 
      * @brief     : search the cycle.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : static std::vector<std::string> m_moduleList.
      *              std::vector<std::vector<int>> m_adjacentMatrix.
      * @param[out]: std::vector<std::vector<int>> m_cycle.

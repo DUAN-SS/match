@@ -76,7 +76,7 @@ private:
 
     /** 
      * @brief     : parse the step size and final time.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    :  
      * @param[in] : const rapidjson::Document& doc
      * @param[out]: Timing step
      * @return    : none
@@ -86,7 +86,7 @@ private:
 
     /** 
      * @brief     : record the module number.
-     * @author    : yongping.duan@keliangtek.com
+     * @author    :  
      * @param[in] : const std::string& name: the name of module.
      * @param[out]: static std::vector<std::string> m_moduleList.
      * @return    : none
@@ -96,7 +96,7 @@ private:
 
     /** 
      * @brief     : record the module MyClass::relationship.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : const std::string& from: the input of module.
      *              const std::string& to: the output of module.
      * @param[out]: static std::vector<std::vector<std::string>> m_relationship.
@@ -107,7 +107,7 @@ private:
 
     /** 
      * @brief     : get module index in the m_moduleList.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : std::string module_name: the module name.
      * @param[out]: none
      * @return    : return module index in the m_moduleList if success, otherwise,
@@ -124,7 +124,7 @@ public:
     }
     /** 
      * @brief     : parse the module infomation.
-     * @author    : yongping.duan@keliangtek.
+     * @author    : 
      * @param[in] : modelconfig.json.
      * @param[out]: static Timing m_step.
      *            : static std::map<std::string, Gain> m_gainModule.
